@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #c6a647;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: rgb(207, 222, 78);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.85em;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #ffffff;
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #e8dede;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Registration</h2>
+    <form id="regForm">
+      <label>Email:
+        <input type="text" id="email">
+        <span class="error" id="emailError"></span>
+      </label>
+      <label>Password:
+        <input type="password" id="password">
+        <span class="error" id="passwordError"></span>
+      </label>
+      <label>Repeat:
+        <input type="password" id="repeat">
+        <span class="error" id="repeatError"></span>
+      </label>
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+
+  <script>
+    if (localStorage.getItem("userEmail")) {
+      window.location.href = "info.html";
+    }
+
+    document.getElementById("regForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const repeat = document.getElementById("repeat").value;
+
+      const emailError = document.getElementById("emailError");
+      const passwordError = document.getElementById("passwordError");
+      const repeatError = document.getElementById("repeatError");
+
+      emailError.textContent = "";
+      passwordError.textContent = "";
+      repeatError.textContent = "";
+
+      let isValid = true;
+
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!email || !emailRegex.test(email) || email.indexOf('@') < 3) {
+        emailError.textContent = "Invalid email format";
+        isValid = false;
+      }
+
+      const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+      if (!password || !passRegex.test(password)) {
+        passwordError.textContent = "Password: minimum 6 characters, 1 uppercase, 1 lowercase, 1 number";
+        isValid = false;
+      }
+
+      if (!repeat || repeat !== password) {
+        repeatError.textContent = "The passwords do not match";
+        isValid = false;
+      }
+
+      if (isValid) {
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userPassword", password);
+        window.location.href = "info.html";
+      }
+    });
+  </script>
+</body>
+</html>

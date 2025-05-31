@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>UserINFO</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #d8b54c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: rgb(172, 211, 62);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 500px;
+    }
+
+    h2, h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.85em;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #e4ede6;
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #ebdddd;
+    }
+
+    #exit {
+      font-size: 0.9em;
+      margin-left: 10px;
+      color: #dc3545;
+      text-decoration: none;
+    }
+
+    #exit:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <script>
+      const email = localStorage.getItem("userEmail");
+      const password = localStorage.getItem("userPassword");
+      if (!email || !password) {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <h3>Hello, <span id="userEmail"></span> <a href="#" id="exit">(Exit)</a></h3>
+    <h2>User information</h2>
+
+    <form id="infoForm">
+      <label>First Name:
+        <input type="text" id="firstName">
+        <span class="error" id="firstNameError"></span>
+      </label>
+
+      <label>Last Name:
+        <input type="text" id="lastName">
+        <span class="error" id="lastNameError"></span>
+      </label>
+
+      <label>Year of birth:
+        <input type="number" id="birth" min="1900" max="2025">
+        <span class="error" id="birthError"></span>
+      </label>
+
+      <label>Gender:
+        <select id="gender">
+          <option value="">Select</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+        <span class="error" id="genderError"></span>
+      </label>
+
+      <label>Phone Number:
+        <input type="text" id="phone">
+        <span class="error" id="phoneError"></span>
+      </label>
+
+      <label>Skype:
+        <input type="text" id="skype">
+        <span class="error" id="skypeError"></span>
+      </label>
+
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("userEmail").textContent = localStorage.getItem("userEmail");
+
+    document.getElementById("exit").addEventListener("click", function () {
+      localStorage.clear();
+      window.location.href = "index.html";
+    });
+
+    const savedInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (savedInfo) {
+      document.getElementById("firstName").value = savedInfo.firstName || "";
+      document.getElementById("lastName").value = savedInfo.lastName || "";
+      document.getElementById("birth").value = savedInfo.birth || "";
+      document.getElementById("gender").value = savedInfo.gender || "";
+      document.getElementById("phone").value = savedInfo.phone || "";
+      document.getElementById("skype").value = savedInfo.skype || "";
+    }
+
+    document.getElementById("infoForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const birth = parseInt(document.getElementById("birth").value);
+      const gender = document.getElementById("gender").value;
+      const phone = document.getElementById("phone").value.trim();
+      const skype = document.getElementById("skype").value.trim();
+
+      let isValid = true;
+
+      const errors = {
+        firstNameError: "",
+        lastNameError: "",
+        birthError: "",
+        genderError: "",
+        phoneError: "",
+        skypeError: ""
+      };
+
+      const nameRegex = /^[A-Za-zА-Яа-я]{1,20}$/;
+      if (!firstName || !nameRegex.test(firstName)) {
+        errors.firstNameError = "Only letters are allowed, maximum 20 characters";
+        isValid = false;
+      }
+
+      if (!lastName || !nameRegex.test(lastName)) {
+        errors.lastNameError = "Only letters are allowed, maximum 20 characters";
+        isValid = false;
+      }
+
+      const currentYear = new Date().getFullYear();
+      if (!birth || birth < 1900 || birth > currentYear) {
+        errors.birthError = "Please enter the correct year(1900-2025)";
+        isValid = false;
+      }
+
+      if (!gender) {
+        errors.genderError = "Select gender";
+        isValid = false;
+      }
+
+      if (phone) {
+        const digits = phone.replace(/\D/g, "");
+        if (digits.length < 10 || digits.length > 12 || !/^[-+() 0-9]*$/.test(phone)) {
+          errors.phoneError = "Invalid phone format";
+          isValid = false;
+        }
+      }
+
+      if (skype && !/^[A-Za-z0-9.-]{3,}$/i.test(skype)) {
+        errors.skypeError = "Invalid Skype ID";
+        isValid = false;
+      }
+
+      for (let id in errors) {
+        document.getElementById(id).textContent = errors[id];
+      }
+
+      if (isValid) {
+        const userInfo = { firstName, lastName, birth, gender, phone, skype };
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+        alert("Information saved successfully!");
+      }
+    });
+  </script>
+</body>
+</html>
